@@ -1,1 +1,1 @@
-# Humore-Project
+# Humor-Project
