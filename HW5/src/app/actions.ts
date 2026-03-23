@@ -18,7 +18,8 @@ export async function submitVote(captionId: string, vote: number) {
     caption_id: captionId,
     profile_id: user.id,
     vote_value: vote,
-    created_datetime_utc: new Date().toISOString(),
+    created_by_user_id: user.id,
+    modified_by_user_id: user.id,
   });
 
   if (error) {
