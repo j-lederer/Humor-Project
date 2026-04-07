@@ -182,7 +182,7 @@ export default function UploadPage() {
           />
           <div className="text-white">
             <p className="text-2xl mb-2">
-              {uploading ? status : "Drop an image here or click to upload"}
+              {uploading ? status : "Tap to select or drop an image here"}
             </p>
             {!uploading && (
               <p className="text-white/60">

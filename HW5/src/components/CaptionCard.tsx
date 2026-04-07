@@ -23,6 +23,7 @@ export default function CaptionCard({
   const [localUpvotes, setLocalUpvotes] = useState(upvotes);
   const [localDownvotes, setLocalDownvotes] = useState(downvotes);
   const [error, setError] = useState<string | null>(null);
+  const [justVoted, setJustVoted] = useState(false);
 
   const handleVote = (vote: number) => {
     if (myVote !== null) return; // already voted
@@ -33,6 +34,8 @@ export default function CaptionCard({
         setError(result.error);
       } else {
         setMyVote(vote);
+        setJustVoted(true);
+        setTimeout(() => setJustVoted(false), 1500);
         if (vote === 1) setLocalUpvotes((n) => n + 1);
         else setLocalDownvotes((n) => n + 1);
       }
@@ -77,7 +80,10 @@ export default function CaptionCard({
         </button>
 
         {isPending && <span className="text-white/60 text-sm">Saving...</span>}
-        {alreadyVoted && !isPending && (
+        {justVoted && (
+          <span className="text-green-300 text-sm animate-pulse">Vote recorded!</span>
+        )}
+        {alreadyVoted && !isPending && !justVoted && (
           <span className="text-white/50 text-sm">
             You voted {myVote === 1 ? "👍" : "👎"}
           </span>

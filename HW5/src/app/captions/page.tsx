@@ -20,7 +20,7 @@ interface VoteRow {
 export default async function CaptionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }) {
   const supabase = await createClient();
 
@@ -32,17 +32,26 @@ export default async function CaptionsPage({
     redirect("/");
   }
 
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, sort: sortParam } = await searchParams;
   const page = Math.max(0, parseInt(pageParam ?? "0", 10) || 0);
+  const sort = sortParam || "newest";
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  // Fetch one page of captions
-  const { data: captions, error: captionsError, count } = await supabase
+  // Fetch one page of captions with sort
+  let query = supabase
     .from("captions")
-    .select("*", { count: "exact" })
-    .order("id")
-    .range(from, to);
+    .select("*", { count: "exact" });
+
+  if (sort === "most-liked") {
+    query = query.order("like_count", { ascending: false });
+  } else if (sort === "oldest") {
+    query = query.order("created_datetime_utc", { ascending: true });
+  } else {
+    query = query.order("created_datetime_utc", { ascending: false });
+  }
+
+  const { data: captions, error: captionsError, count } = await query.range(from, to);
 
   if (captionsError) {
     console.error("Error fetching captions:", captionsError);
@@ -111,6 +120,26 @@ export default async function CaptionsPage({
           </Link>
         </div>
 
+        <div className="mb-6 flex gap-2">
+          {[
+            { value: "newest", label: "Newest" },
+            { value: "oldest", label: "Oldest" },
+            { value: "most-liked", label: "Most Liked" },
+          ].map((opt) => (
+            <Link
+              key={opt.value}
+              href={`/captions?sort=${opt.value}`}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                sort === opt.value
+                  ? "bg-white text-violet-600"
+                  : "bg-white/20 text-white hover:bg-white/30"
+              }`}
+            >
+              {opt.label}
+            </Link>
+          ))}
+        </div>
+
         {captionList.length === 0 ? (
           <div className="text-center text-white/80 bg-white/10 rounded-xl p-12">
             <p className="text-xl">No captions found.</p>
@@ -139,7 +168,7 @@ export default async function CaptionsPage({
             {/* Pagination */}
             <div className="flex items-center justify-between">
               <Link
-                href={page > 0 ? `/captions?page=${page - 1}` : "#"}
+                href={page > 0 ? `/captions?page=${page - 1}&sort=${sort}` : "#"}
                 className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
                   page === 0
                     ? "bg-white/10 text-white/30 cursor-not-allowed"
@@ -153,7 +182,7 @@ export default async function CaptionsPage({
               </span>
               <Link
                 href={
-                  page < totalPages - 1 ? `/captions?page=${page + 1}` : "#"
+                  page < totalPages - 1 ? `/captions?page=${page + 1}&sort=${sort}` : "#"
                 }
                 className={`px-5 py-2 rounded-lg font-semibold transition-colors ${
                   page >= totalPages - 1

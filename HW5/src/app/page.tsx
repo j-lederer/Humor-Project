@@ -57,11 +57,14 @@ function HomeContent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-500 to-fuchsia-600">
       <main className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-12 shadow-xl">
-        <h1 className="text-5xl font-bold text-white drop-shadow-lg mb-4">
-          HW5: Image Captions
+        <h1 className="text-5xl font-bold text-white drop-shadow-lg mb-2">
+          Almost Crack&apos;d
         </h1>
-        <p className="text-xl text-white/80 mb-8">
-          Upload images and generate captions with AI
+        <p className="text-lg text-white/80 mb-2">
+          Upload images and let AI generate hilarious captions
+        </p>
+        <p className="text-sm text-white/60 mb-8">
+          Vote on your favorites to help us find the funniest AI-generated humor
         </p>
 
         {error && (
